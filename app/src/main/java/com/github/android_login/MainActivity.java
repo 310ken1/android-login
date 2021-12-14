@@ -3,8 +3,9 @@ package com.github.android_login;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.github.android_login.ui.login.LoginFragment;
+import com.github.android_login.ui.login.LoginViewModel;
 import com.github.android_login.ui.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,5 +19,17 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.container, MainFragment.newInstance())
                     .commitNow();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LoginViewModel model = new ViewModelProvider(this).get(LoginViewModel.class);
+        model.logout();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

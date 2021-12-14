@@ -15,7 +15,7 @@ import com.github.android_login.ui.login.LoginFragment;
 import com.github.android_login.ui.login.LoginViewModel;
 
 public class MainFragment extends Fragment {
-    private static final String TAG = MainFragment.class.getSimpleName();
+    public static final String TAG = MainFragment.class.getSimpleName();
 
     private MainViewModel mViewModel;
 
@@ -40,8 +40,8 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
         LoginViewModel model = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        if (-1 == model.getCurrentAuthority()) {
-            LoginFragment.newInstance().show(getChildFragmentManager(), TAG);
+        if (!model.isLoggedIn()) {
+            LoginFragment.newInstance().show(getChildFragmentManager(), LoginFragment.TAG);
         }
     }
 }

@@ -6,16 +6,22 @@ public abstract class Notifier<T> {
     private final ArrayList<T> listeners = new ArrayList<T>();
 
     public void add(T listener) {
-        listeners.add(listener);
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
     }
 
     public void remote(T listener) {
-        listeners.remove(listener);
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
     }
 
     protected void notify(Notice<T> notice) {
-        for (T listener : listeners) {
-            notice.exec(listener);
+        synchronized(listeners) {
+            for (T listener : listeners) {
+                notice.exec(listener);
+            }
         }
     }
 

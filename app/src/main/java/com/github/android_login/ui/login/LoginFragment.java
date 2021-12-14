@@ -1,10 +1,9 @@
 package com.github.android_login.ui.login;
 
+import android.app.Dialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.github.android_login.databinding.FragmentLoginBinding;
 
 public class LoginFragment extends DialogFragment {
-    private static final String TAG = LoginFragment.class.getSimpleName();
+    public static final String TAG = LoginFragment.class.getSimpleName();
+
     private LoginViewModel loginViewModel;
     private FragmentLoginBinding binding;
     private final TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -31,7 +31,8 @@ public class LoginFragment extends DialogFragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            loginViewModel.loginDataChanged(binding.username.getText().toString(),
+            loginViewModel.loginDataChanged(
+                    binding.username.getText().toString(),
                     binding.password.getText().toString());
         }
     };
@@ -45,7 +46,6 @@ public class LoginFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -55,25 +55,34 @@ public class LoginFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
-        loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), loginFormState -> {
-            if (loginFormState == null) {
-                return;
-            }
-            binding.login.setEnabled(loginFormState.isDataValid());
-        });
+        loginViewModel.getLoginFormValid().observe(getViewLifecycleOwner(),
+                loginFormState -> binding.login.setEnabled(loginFormState));
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(),
+                loginResult -> {
+                    if (loginResult) dismiss();
+                }
+        );
 
         binding.username.addTextChangedListener(afterTextChangedListener);
         binding.password.addTextChangedListener(afterTextChangedListener);
 
         binding.login.setOnClickListener(v -> {
-            loginViewModel.login(Integer.parseInt(binding.username.getText().toString()),
-                    binding.password.getText().toString(), (id, login) -> {
-                        Log.d(TAG, "Login:" + id + " result:" + login);
-                        if (login) {
-                            dismiss();
-                        }
-                    });
+            loginViewModel.login(
+                    Integer.parseInt(binding.username.getText().toString()),
+                    binding.password.getText().toString());
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (null != dialog) {
+            dialog.getWindow().getDecorView().setPadding(0,0,0,0);
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+        }
     }
 
     @Override

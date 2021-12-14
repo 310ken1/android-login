@@ -8,37 +8,44 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.github.android_login.AndroidLoginApplication;
-import com.github.android_login.manager.account.LoginCallback;
+import com.github.android_login.manager.account.AccountManager;
 
 public class LoginViewModel extends AndroidViewModel {
-    private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loginFormValid = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loginResult = new MutableLiveData<>();
+    private final AccountManager manager;
 
     public LoginViewModel(@NonNull Application application) {
         super(application);
+        manager = ((AndroidLoginApplication) application).appContainer.accountManager;
     }
 
-    LiveData<LoginFormState> getLoginFormState() {
-        return loginFormState;
+    public LiveData<Boolean> getLoginFormValid() {
+        return loginFormValid;
+    }
+
+    public LiveData<Boolean> getLoginResult() {
+        return loginResult;
     }
 
     public int getCurrentAuthority() {
-        AndroidLoginApplication app = (AndroidLoginApplication) getApplication();
-        return app.appContainer.accountManager.getCurrentAuthority();
+        return manager.getCurrentAuthority();
     }
 
-    public void login(int id, String password, LoginCallback callback) {
-        AndroidLoginApplication app = (AndroidLoginApplication) getApplication();
-        app.appContainer.accountManager.login(id, password, callback);
+    public boolean isLoggedIn() {
+        return manager.isLoggedIn();
+    }
+
+    public void login(int id, String password) {
+        manager.login(id, password, loginResult::postValue);
+    }
+
+    public void logout() {
+        manager.logout();
     }
 
     public void loginDataChanged(String username, String password) {
-        if (!isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(false));
-        } else if (!isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(false));
-        } else {
-            loginFormState.setValue(new LoginFormState(true));
-        }
+        loginFormValid.setValue(isUserNameValid(username) && isPasswordValid(password));
     }
 
     private boolean isUserNameValid(String username) {
