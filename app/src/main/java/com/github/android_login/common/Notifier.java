@@ -11,7 +11,7 @@ public abstract class Notifier<T> {
         }
     }
 
-    public void remote(T listener) {
+    public void remove(T listener) {
         synchronized (listeners) {
             listeners.remove(listener);
         }
