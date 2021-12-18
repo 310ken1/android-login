@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.android_login">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:name=".AndroidLoginApplication"
         android:allowBackup="false"
