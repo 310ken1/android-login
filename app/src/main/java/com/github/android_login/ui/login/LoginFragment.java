@@ -3,6 +3,7 @@ package com.github.android_login.ui.login;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class LoginFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate()");
         setStyle(STYLE_NORMAL, R.style.Theme_FullScreenDialog);
     }
 
@@ -52,6 +54,7 @@ public class LoginFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -59,6 +62,7 @@ public class LoginFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated()");
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
         loginViewModel.getLoginFormValid().observe(getViewLifecycleOwner(),
@@ -80,8 +84,15 @@ public class LoginFragment extends DialogFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume()");
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Log.d(TAG, "onDestroyView()");
         binding = null;
     }
 }

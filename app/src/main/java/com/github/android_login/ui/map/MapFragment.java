@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,12 +19,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.android_login.databinding.FragmentMapBinding;
+import com.github.android_login.ui.login.LoginFragment;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class MapFragment extends Fragment {
+    public static final String TAG = MapFragment.class.getSimpleName();
+
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -83,7 +87,9 @@ public class MapFragment extends Fragment {
             }
             mHideHandler.removeCallbacks(mShowPart2Runnable);
             FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.popBackStack();
+            fragmentManager.beginTransaction()
+                    .hide(MapFragment.this)
+                    .commit();
             return false;
         }
     };
@@ -114,7 +120,7 @@ public class MapFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreateView()");
         binding = FragmentMapBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
@@ -123,6 +129,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated()");
         mVisible = true;
 
         mControlsView = binding.fullscreenContentControls;
@@ -145,6 +152,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume()");
         if (getActivity() != null && getActivity().getWindow() != null) {
             getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
@@ -158,6 +166,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause()");
         if (getActivity() != null && getActivity().getWindow() != null) {
             getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
@@ -170,6 +179,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy()");
         mContentView = null;
         mControlsView = null;
     }
@@ -234,6 +244,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Log.d(TAG, "onDestroyView()");
         binding = null;
     }
 }

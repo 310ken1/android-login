@@ -6,6 +6,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.github.android_login.R;
 import com.github.android_login.databinding.MainFragmentBinding;
-import com.github.android_login.service.account.User;
 import com.github.android_login.ui.login.LoginFragment;
 import com.github.android_login.ui.login.LoginViewModel;
 import com.github.android_login.ui.map.MapFragment;
@@ -37,6 +37,7 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
         binding = MainFragmentBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -44,15 +45,22 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated()");
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         binding.map.setOnClickListener(v -> {
             FragmentManager fragmentManager = getParentFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, MapFragment.class, null, "tag")
-                    .setReorderingAllowed(true)
-                    .addToBackStack(null)
-                    .commit();
+            MapFragment fragment = (MapFragment) fragmentManager.findFragmentByTag(MapFragment.TAG);
+            if (null == fragment) {
+                fragmentManager.beginTransaction()
+                        .add(R.id.container, MapFragment.class, null, MapFragment.TAG)
+                        .setReorderingAllowed(true)
+                        .commit();
+            } else {
+                fragmentManager.beginTransaction()
+                        .show(fragment)
+                        .commit();
+            }
         });
 
         binding.vibrator.setOnClickListener(v -> {
@@ -70,9 +78,17 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume()");
         LoginViewModel model = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         if (!model.isLoggedIn()) {
             LoginFragment.newInstance().show(getChildFragmentManager(), LoginFragment.TAG);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView()");
+        binding = null;
     }
 }
