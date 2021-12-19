@@ -10,14 +10,14 @@ import java.util.List;
 
 @Dao
 public interface UserDao {
-    @Query("SELECT * FROM user WHERE id=(:id)")
-    User get(int id);
+    @Query("SELECT * FROM users WHERE id=(:id)")
+    User get(String id);
 
-    @Query("SELECT * FROM user")
-    List<User> getAll();
+    @Query("SELECT * FROM users WHERE id IN (:ids)")
+    List<User> get(String[] ids);
 
-    @Query("SELECT * FROM user WHERE id IN (:ids)")
-    List<User> loadAllByIds(int[] ids);
+    @Query("SELECT * FROM users")
+    List<User> get();
 
     @Insert
     void insert(User user);

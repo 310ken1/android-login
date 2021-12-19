@@ -68,7 +68,7 @@ public class LoginFragment extends DialogFragment {
 
         binding.login.setOnClickListener(v -> {
             loginViewModel.login(
-                    Integer.parseInt(binding.username.getText().toString()),
+                    binding.username.getText().toString(),
                     binding.password.getText().toString());
         });
     }

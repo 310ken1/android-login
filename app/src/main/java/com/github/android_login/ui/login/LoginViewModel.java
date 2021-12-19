@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.github.android_login.AndroidLoginApplication;
 import com.github.android_login.manager.account.AccountManager;
+import com.github.android_login.service.account.User;
 
 public class LoginViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> loginFormValid = new MutableLiveData<>();
@@ -28,15 +29,15 @@ public class LoginViewModel extends AndroidViewModel {
         return loginResult;
     }
 
-    public int getCurrentAuthority() {
-        return manager.getCurrentAuthority();
+    public User getLoginUser() {
+        return manager.getLoginUser();
     }
 
     public boolean isLoggedIn() {
         return manager.isLoggedIn();
     }
 
-    public void login(int id, String password) {
+    public void login(String id, String password) {
         manager.login(id, password, loginResult::postValue);
     }
 

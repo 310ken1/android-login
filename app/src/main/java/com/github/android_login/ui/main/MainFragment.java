@@ -51,8 +51,6 @@ public class MainFragment extends Fragment {
             Ringtone ringtone = RingtoneManager.getRingtone(requireContext(), uri);
             ringtone.play();
         });
-
-
     }
 
     @Override
