@@ -8,6 +8,16 @@
     tools:context=".ui.main.MainFragment">
 
     <Button
+        android:id="@+id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="map"
+        app:layout_constraintBottom_toTopOf="@+id/vibrator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
         android:id="@+id/vibrator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

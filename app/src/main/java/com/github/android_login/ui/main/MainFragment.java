@@ -13,11 +13,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.android_login.R;
 import com.github.android_login.databinding.MainFragmentBinding;
+import com.github.android_login.service.account.User;
 import com.github.android_login.ui.login.LoginFragment;
 import com.github.android_login.ui.login.LoginViewModel;
+import com.github.android_login.ui.map.MapFragment;
 
 public class MainFragment extends Fragment {
     public static final String TAG = MainFragment.class.getSimpleName();
@@ -41,6 +45,16 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        binding.map.setOnClickListener(v -> {
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, MapFragment.class, null, "tag")
+                    .setReorderingAllowed(true)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         binding.vibrator.setOnClickListener(v -> {
             Vibrator vibrator = (Vibrator) requireActivity().getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(new long[]{0, 1000, 400, 200, 400, 200}, -1);
