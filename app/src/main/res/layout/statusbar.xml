@@ -1,0 +1,28 @@
+<com.github.android_login.ui.map.StatusBar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextClock
+        style="@style/Widget.Theme.Androidlogin.StatusBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:format24Hour="@string/time_format"
+        tools:ignore="RtlHardcoded" />
+
+    <Space
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/battery"
+        style="@style/Widget.Theme.Androidlogin.StatusBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        tools:ignore="RtlHardcoded" />
+
+</com.github.android_login.ui.map.StatusBar>

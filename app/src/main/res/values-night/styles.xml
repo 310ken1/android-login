@@ -1,0 +1,6 @@
+<resources>
+
+    <style name="Widget.Theme.Androidlogin.StatusBar" parent="">
+        <item name="android:textColor">@color/gray_600</item>
+    </style>
+</resources>
