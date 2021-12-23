@@ -17,7 +17,13 @@ public abstract class Notifier<T> {
         }
     }
 
-    protected void notify(Notice<T> notice) {
+    public void clean() {
+        synchronized (listeners) {
+            listeners.clear();
+        }
+    }
+
+    public void notify(Notice<T> notice) {
         synchronized(listeners) {
             for (T listener : listeners) {
                 notice.exec(listener);

@@ -5,10 +5,16 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.android_login.manager.notification.Notification;
+import com.github.android_login.manager.notification.NotificationHigh;
+import com.github.android_login.ui.alert.AlertFragment;
+import com.github.android_login.ui.alert.AlertViewModel;
 import com.github.android_login.ui.login.LoginViewModel;
 import com.github.android_login.ui.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    private AlertViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +25,17 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.container, MainFragment.newInstance())
                     .commitNow();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        model = new ViewModelProvider(this).get(AlertViewModel.class);
+        model.notificationLiveData.observe(this, notification -> {
+            if (notification instanceof NotificationHigh) {
+                AlertFragment.newInstance().show(getSupportFragmentManager(), AlertFragment.TAG);
+            }
+        });
     }
 
     @Override
