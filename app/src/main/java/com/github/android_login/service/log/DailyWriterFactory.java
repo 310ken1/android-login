@@ -16,12 +16,18 @@ import java.util.Locale;
 public class DailyWriterFactory implements WriterFactory {
     private final String dir;
     private final String name;
+    private final String header;
     private BufferedWriter writer;
     private File file;
 
-    public DailyWriterFactory(@NonNull String dir, @NonNull String name) {
+    public DailyWriterFactory(@NonNull String dir, @NonNull String name, String header) {
         this.dir = dir;
         this.name = name;
+        this.header = header;
+    }
+
+    public DailyWriterFactory(@NonNull String dir, @NonNull String name) {
+        this(dir, name, null);
     }
 
     @Override
@@ -29,6 +35,13 @@ public class DailyWriterFactory implements WriterFactory {
     BufferedWriter getWriter(@NonNull LogEntry entry) {
         File file = createFile(dir, name);
         if (!file.equals(this.file)) {
+            if (null != writer) {
+                try {
+                    writer.flush();
+                    writer.close();
+                } catch (Exception ignored) {
+                }
+            }
             this.file = file;
             this.writer = createWriter(file);
         }
@@ -39,17 +52,21 @@ public class DailyWriterFactory implements WriterFactory {
     public @NonNull
     File createFile(@NonNull String dir, @NonNull String name) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.JAPAN);
-        return new File(dir + sdf.format(Calendar.getInstance().getTime()) + name);
+        return new File(dir, sdf.format(Calendar.getInstance().getTime()) + name);
     }
 
     public @Nullable
     BufferedWriter createWriter(@NonNull File file) {
         BufferedWriter writer = null;
         try {
-            file.createNewFile();
             writer = new BufferedWriter(
                     new OutputStreamWriter(
                             new FileOutputStream(file, true), StandardCharsets.UTF_8));
+            if (file.length() == 0 && null != header) {
+                writer.write(header);
+                writer.newLine();
+                writer.flush();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

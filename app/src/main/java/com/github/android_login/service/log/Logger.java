@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Logger {
 
-    private final BlockingQueue<LogEntry> logQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Entry> logQueue = new LinkedBlockingQueue<>();
     private boolean active;
 
     public Logger(@NonNull WriterFactory factory) {
@@ -21,18 +21,15 @@ public class Logger {
         exec.submit(() -> {
             BufferedWriter writer = null;
             try {
-                long last = System.currentTimeMillis();
                 while (active) {
-                    LogEntry entry = logQueue.take();
-                    writer = factory.getWriter(entry);
-                    if (null == writer) throw new IOException();
-                    writer.write(entry.getLog());
-                    writer.newLine();
-
-                    long time = System.currentTimeMillis();
-                    if (time - last > 1000) {
+                    Entry entry = logQueue.take();
+                    if (entry instanceof LogEntry) {
+                        LogEntry e = (LogEntry) entry;
+                        writer = factory.getWriter(e);
+                        if (null == writer) throw new IOException();
+                        writer.write(e.getLog());
+                        writer.newLine();
                         writer.flush();
-                        last = time;
                     }
                 }
             } catch (IOException | InterruptedException e) {
@@ -52,10 +49,10 @@ public class Logger {
 
     public void close() {
         active = false;
-        logQueue.add(null);
+        logQueue.add(new CloseEntry());
     }
 
-    public void write(@NonNull LogEntry entry) {
+    public void write(@NonNull Entry entry) {
         logQueue.add(entry);
     }
 }
