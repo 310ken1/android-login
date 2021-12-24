@@ -22,7 +22,8 @@ public class AccountService {
         db = Room.databaseBuilder(context, AccountDatabase.class, dbName).build();
     }
 
-    public void authentication(String id, @NonNull String password,
+    public void authentication(@NonNull String id,
+                               @NonNull String password,
                                @NonNull AuthenticationCallback callback) {
         if (null == db) {
             callback.onResult(id, false, null);
@@ -41,7 +42,19 @@ public class AccountService {
         }
     }
 
-    public void get(@NonNull String id, UsersCallback callback) {
+    public void get(@NonNull UserListCallback callback) {
+        if (null == db) {
+            callback.onResult(null);
+        } else {
+            new Thread(() -> {
+                List<User> users = db.userDao().get();
+                callback.onResult(users);
+            }).start();
+        }
+    }
+
+    public void get(@NonNull String id,
+                    @NonNull UserListCallback callback) {
         if (null == db) {
             callback.onResult(null);
         } else {
@@ -54,7 +67,8 @@ public class AccountService {
         }
     }
 
-    public void update(@NonNull String id, @NonNull String password, int authority,
+    public void update(@NonNull String id,
+                       @NonNull String password, int authority,
                        @NonNull ResultCallback callback) {
         if (null == db) {
             callback.onResult(false);
@@ -72,7 +86,9 @@ public class AccountService {
         }
     }
 
-    public void insert(@NonNull String id, @NonNull String password, int authority,
+    public void insert(@NonNull String id,
+                       @NonNull String password,
+                       int authority,
                        @NonNull ResultCallback callback) {
         if (null == db) {
             callback.onResult(false);
