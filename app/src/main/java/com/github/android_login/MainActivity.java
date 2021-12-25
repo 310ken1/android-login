@@ -2,16 +2,20 @@ package com.github.android_login;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.android_login.manager.notification.NotificationBattery;
+import com.github.android_login.manager.notification.NotificationManager;
+import com.github.android_login.manager.notification.NotificationState;
 import com.github.android_login.ui.alert.AlertViewModel;
 import com.github.android_login.ui.login.LoginViewModel;
 import com.github.android_login.ui.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private AlertViewModel model;
 
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         model.notificationLiveData.observe(this, notification -> {
             if (notification instanceof NotificationBattery) {
                 showBatteryAlert((NotificationBattery) notification);
+            } else if (notification instanceof NotificationState) {
+                NotificationState n = (NotificationState)notification;
+                Log.d(TAG, "wifi:" + n.wifi.enable);
             }
         });
     }

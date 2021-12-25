@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.StatFs;
 import android.util.Log;
@@ -30,6 +31,8 @@ public class NotificationManager extends Notifier<NotificationListener> {
     private Timer timer;
     private final int interval = 10000;
 
+    private final NotificationState state = new NotificationState();
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -37,6 +40,9 @@ public class NotificationManager extends Notifier<NotificationListener> {
             switch (intent.getAction()) {
                 case Intent.ACTION_BATTERY_CHANGED:
                     checkBattery(intent);
+                    break;
+                case WifiManager.WIFI_STATE_CHANGED_ACTION:
+                    checkWifi(intent);
                     break;
                 default:
                     break;
@@ -47,7 +53,9 @@ public class NotificationManager extends Notifier<NotificationListener> {
     public NotificationManager(Context context) {
         this.context = context;
 
-        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         context.registerReceiver(receiver, filter);
 
         timer = new Timer();
@@ -107,6 +115,29 @@ public class NotificationManager extends Notifier<NotificationListener> {
             notify(new NotificationBattery(rate));
         }
         if (DEBUG) Log.d(TAG, "storageThreshold=" + storageThreshold);
+    }
+
+    private void checkWifi(Intent intent) {
+        int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                WifiManager.WIFI_STATE_DISABLED);
+        boolean change = false;
+        switch (state) {
+            case WifiManager.WIFI_STATE_DISABLED:
+                if (DEBUG) Log.d(TAG, "WiFi:OFF");
+                this.state.wifi = new State(false);
+                change = true;
+                break;
+            case WifiManager.WIFI_STATE_ENABLED:
+                if (DEBUG) Log.d(TAG, "WiFi:ON");
+                this.state.wifi = new State(true);
+                change = true;
+                break;
+            default:
+                break;
+        }
+        if (change) {
+            notify(this.state);
+        }
     }
 
     private void notify(Notification notification) {
