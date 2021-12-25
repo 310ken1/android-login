@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private AlertViewModel model;
+    private AlertDialog batteryDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +58,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showBatteryAlert(NotificationBattery notification) {
-        new AlertDialog.Builder(this)
+        if (null != batteryDialog) batteryDialog.dismiss();
+        batteryDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.alert_dialog_title)
                 .setMessage(String.format(getString(R.string.alert_dialog_message_format), notification.level))
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    batteryDialog = null;
                     dialog.dismiss();
                 })
                 .setCancelable(false)
