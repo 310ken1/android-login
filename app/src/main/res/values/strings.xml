@@ -12,4 +12,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
     <string name="time_format">yyyy/MM/dd HH:mm:ss</string>
+
+
+    <string name="alert_dialog_title">警告</string>
+    <string name="alert_dialog_message_format">残り%d%%です</string>
 </resources>

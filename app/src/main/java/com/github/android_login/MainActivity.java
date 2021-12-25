@@ -1,13 +1,12 @@
 package com.github.android_login;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.github.android_login.manager.notification.Notification;
-import com.github.android_login.manager.notification.NotificationHigh;
-import com.github.android_login.ui.alert.AlertFragment;
+import com.github.android_login.manager.notification.NotificationBattery;
 import com.github.android_login.ui.alert.AlertViewModel;
 import com.github.android_login.ui.login.LoginViewModel;
 import com.github.android_login.ui.main.MainFragment;
@@ -32,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         model = new ViewModelProvider(this).get(AlertViewModel.class);
         model.notificationLiveData.observe(this, notification -> {
-            if (notification instanceof NotificationHigh) {
-                AlertFragment.newInstance().show(getSupportFragmentManager(), AlertFragment.TAG);
+            if (notification instanceof NotificationBattery) {
+                showBatteryAlert((NotificationBattery) notification);
             }
         });
     }
@@ -48,5 +47,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
+    }
+
+    private void showBatteryAlert(NotificationBattery notification) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.alert_dialog_title)
+                .setMessage(String.format(getString(R.string.alert_dialog_message_format), notification.level))
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 }
