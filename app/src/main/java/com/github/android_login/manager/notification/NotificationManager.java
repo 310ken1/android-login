@@ -5,9 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.os.StatFs;
 import android.util.Log;
 
 import com.github.android_login.common.Notifier;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class NotificationManager extends Notifier<NotificationListener> {
     private static final String TAG = NotificationManager.class.getSimpleName();
@@ -18,6 +22,13 @@ public class NotificationManager extends Notifier<NotificationListener> {
     private final int batteryStep = 5;
     private int batteryThresholdMax = 50;
     private int batteryThreshold = batteryThresholdMax;
+
+    private final int storageStep = 5;
+    private final String storagePath = "/sdcard";
+    private int storageThresholdMax = 50;
+    private int storageThreshold = storageThresholdMax;
+    private Timer timer;
+    private final int interval = 10000;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -38,9 +49,21 @@ public class NotificationManager extends Notifier<NotificationListener> {
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         context.registerReceiver(receiver, filter);
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                checkStorage();
+            }
+        }, 0, interval);
     }
 
     public void close() {
+        if (null != timer) {
+            timer.cancel();
+            timer = null;
+        }
         context.unregisterReceiver(receiver);
     }
 
@@ -60,8 +83,30 @@ public class NotificationManager extends Notifier<NotificationListener> {
         } else {
             int value = threshold(level, batteryStep);
             batteryThreshold = Math.max(value, 0);
-            notify(new NotificationBattery(true, level));
+            notify(new NotificationBattery(level));
         }
+        if (DEBUG) Log.d(TAG, "batteryThreshold=" + batteryThreshold);
+    }
+
+    private void checkStorage() {
+        StatFs statFs = new StatFs(storagePath);
+        double total = statFs.getBlockCountLong() * statFs.getBlockSizeLong();
+        double free = statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong();
+        int rate = (int) (free / total * 100.0);
+        if (DEBUG) Log.d(TAG,
+                "total=" + total +
+                        " free=" + free +
+                        " rate=" + rate +
+                        " storageThreshold=" + storageThreshold);
+        if (storageThreshold < rate) {
+            int value = threshold(rate, storageStep);
+            storageThreshold = Math.min(value, batteryThresholdMax);
+        } else {
+            int value = threshold(rate, storageStep);
+            storageThreshold = Math.max(value, 0);
+            notify(new NotificationBattery(rate));
+        }
+        if (DEBUG) Log.d(TAG, "storageThreshold=" + storageThreshold);
     }
 
     private void notify(Notification notification) {
