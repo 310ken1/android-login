@@ -12,8 +12,10 @@ import android.util.Log;
 
 import com.github.android_login.common.Notifier;
 
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NotificationManager extends Notifier<NotificationListener> {
     private static final String TAG = NotificationManager.class.getSimpleName();
@@ -30,7 +32,7 @@ public class NotificationManager extends Notifier<NotificationListener> {
     private int storageThresholdMax = 50;
     private int storageThreshold = storageThresholdMax;
     private Timer timer;
-    private final int interval = 10000;
+    private final int interval = 1000;
 
     private final NotificationState state = new NotificationState();
 
@@ -53,6 +55,9 @@ public class NotificationManager extends Notifier<NotificationListener> {
         }
     };
 
+    int count = 10;
+    int life = 10 * 1000;
+
     public NotificationManager(Context context) {
         this.context = context;
 
@@ -62,11 +67,26 @@ public class NotificationManager extends Notifier<NotificationListener> {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         context.registerReceiver(receiver, filter);
 
+        ConcurrentHashMap<Integer, State> map = new ConcurrentHashMap<>();
+
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 checkStorage();
+                if (0 < count) {
+                    map.put(count, new State(true));
+                    count--;
+                } else {
+                    long current = System.currentTimeMillis();
+                    for(Iterator<State> i = map.values().iterator(); i.hasNext();){
+                        State s = i.next();
+                        if((s.timestamp + life) < current){
+                            i.remove();
+                        }
+                    }
+                }
+                Log.d(TAG, "size=" + map.size());
             }
         }, 0, interval);
     }
