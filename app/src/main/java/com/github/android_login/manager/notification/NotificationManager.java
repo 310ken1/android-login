@@ -1,5 +1,6 @@
 package com.github.android_login.manager.notification;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,8 @@ public class NotificationManager extends Notifier<NotificationListener> {
                 case WifiManager.WIFI_STATE_CHANGED_ACTION:
                     checkWifi(intent);
                     break;
+                case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    checkBluetooth(intent);
                 default:
                     break;
             }
@@ -56,6 +59,7 @@ public class NotificationManager extends Notifier<NotificationListener> {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         context.registerReceiver(receiver, filter);
 
         timer = new Timer();
@@ -118,7 +122,7 @@ public class NotificationManager extends Notifier<NotificationListener> {
     }
 
     private void checkWifi(Intent intent) {
-        int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+        final int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
                 WifiManager.WIFI_STATE_DISABLED);
         boolean change = false;
         switch (state) {
@@ -130,6 +134,29 @@ public class NotificationManager extends Notifier<NotificationListener> {
             case WifiManager.WIFI_STATE_ENABLED:
                 if (DEBUG) Log.d(TAG, "WiFi:ON");
                 this.state.wifi = new State(true);
+                change = true;
+                break;
+            default:
+                break;
+        }
+        if (change) {
+            notify(this.state);
+        }
+    }
+
+    private void checkBluetooth(Intent intent) {
+        final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                BluetoothAdapter.ERROR);
+        boolean change = false;
+        switch (state) {
+            case BluetoothAdapter.STATE_OFF:
+                if (DEBUG) Log.d(TAG, "Bluetooth:OFF");
+                this.state.bluetooth = new State(false);
+                change = true;
+                break;
+            case BluetoothAdapter.STATE_ON:
+                if (DEBUG) Log.d(TAG, "Bluetooth:ON");
+                this.state.bluetooth = new State(true);
                 change = true;
                 break;
             default:

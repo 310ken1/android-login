@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.android_login.manager.notification.NotificationBattery;
-import com.github.android_login.manager.notification.NotificationManager;
 import com.github.android_login.manager.notification.NotificationState;
 import com.github.android_login.ui.alert.AlertViewModel;
 import com.github.android_login.ui.login.LoginViewModel;
@@ -38,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
             if (notification instanceof NotificationBattery) {
                 showBatteryAlert((NotificationBattery) notification);
             } else if (notification instanceof NotificationState) {
-                NotificationState n = (NotificationState)notification;
-                Log.d(TAG, "wifi:" + n.wifi.enable);
+                NotificationState n = (NotificationState) notification;
+                Log.d(TAG, "wifi:" + n.wifi.enable +
+                        " bluetooth:" + n.bluetooth.enable);
             }
         });
     }
