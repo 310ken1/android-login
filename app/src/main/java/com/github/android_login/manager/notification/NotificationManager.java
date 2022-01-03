@@ -32,7 +32,7 @@ public class NotificationManager extends Notifier<NotificationListener> {
     private int storageThresholdMax = 50;
     private int storageThreshold = storageThresholdMax;
     private Timer timer;
-    private final int interval = 1000;
+    private final int interval = 10000;
 
     private final NotificationState state = new NotificationState();
 
@@ -74,19 +74,19 @@ public class NotificationManager extends Notifier<NotificationListener> {
             @Override
             public void run() {
                 checkStorage();
-                if (0 < count) {
-                    map.put(count, new State(true));
-                    count--;
-                } else {
-                    long current = System.currentTimeMillis();
-                    for(Iterator<State> i = map.values().iterator(); i.hasNext();){
-                        State s = i.next();
-                        if((s.timestamp + life) < current){
-                            i.remove();
-                        }
-                    }
-                }
-                Log.d(TAG, "size=" + map.size());
+//                if (0 < count) {
+//                    map.put(count, new State(true));
+//                    count--;
+//                } else {
+//                    long current = System.currentTimeMillis();
+//                    for(Iterator<State> i = map.values().iterator(); i.hasNext();){
+//                        State s = i.next();
+//                        if((s.timestamp + life) < current){
+//                            i.remove();
+//                        }
+//                    }
+//                }
+//                Log.d(TAG, "size=" + map.size());
             }
         }, 0, interval);
     }
@@ -97,6 +97,10 @@ public class NotificationManager extends Notifier<NotificationListener> {
             timer = null;
         }
         context.unregisterReceiver(receiver);
+    }
+
+    public NotificationState getState() {
+        return this.state;
     }
 
     private void checkBattery(Intent intent) {
